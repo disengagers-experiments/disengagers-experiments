@@ -18,11 +18,15 @@ button {
 }
 
 .sharp-mask div:first-child {
-  margin: 0 0 -40px -5px;
+  margin: 0 0 -45px -5px;
 }
 
 .sharp-mask div:last-child {
-  margin: -40px 0 0px 5px;
+  margin: -45px 0 0px 5px;
+}
+
+.sharp-mask {
+  font-size: 40px;
 }
 
 .cross {
@@ -30,7 +34,7 @@ button {
 }
 
 .arrow {
-  font-size: 90px;
+  font-size: 50px;
 }
 
 .triangle {
