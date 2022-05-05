@@ -1,0 +1,72 @@
+/* Please define your custom styles here */
+
+body {
+  font-size: 30px;
+}
+
+button {
+  background-color: white;
+  border-radius: 3px;
+  padding: 8px 8px 6px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  bottom: 100px;
+  width: 300px;
+  cursor: pointer;
+}
+
+.sharp-mask div:first-child {
+  margin: 0 0 -40px -5px;
+}
+
+.sharp-mask div:last-child {
+  margin: -40px 0 0px 5px;
+}
+
+.cross {
+  font-size: 40px;
+}
+
+.arrow {
+  font-size: 90px;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 100px solid rgb(114, 114, 114);
+}
+
+.circle {
+  width: 100px;
+  height: 100px;
+  background: rgb(114, 114, 114);
+  border-radius: 50%
+}
+
+.conditions {
+  position: absolute;
+  bottom: 30px;
+  font-size: 25px;
+  color: #000000ab;
+}
+
+.c_left {
+  display: inline-block;
+  padding: 0 70px 0 0;
+}
+
+.c_right {
+  display: inline-block;
+  padding: 0 0 0 70px;
+}
+
+.instruction {
+  font-size: 18px;
+  width: 800px;
+  margin-left: -150px;
+}
