@@ -111,15 +111,20 @@ targets.list = [];
 let sequence = targets.sequence[window.seq];
 console.log(sequence);
 for(var i in sequence) {
-  let t = {'time': '', 'priming_stimul': '', 'target_stimul': ''};
+  let t = {'time': '', 'priming_stimul': '', 'target_stimul': '', 
+           'priming_value': -1, 'target_value': -1};
   let arrow = Math.random() < 0.5 ? targets.stimuls['l'] : targets.stimuls['r'];
   if(sequence[i][0]) {
     t.priming_stimul = arrow;
     t.target_stimul = arrow;
+    t.priming_value = (arrow == targets.stimuls['r']) - 0;
+    t.target_value = t.priming_value;
   }
   else {
     t.priming_stimul = arrow;
     t.target_stimul = arrow == targets.stimuls['l'] ? targets.stimuls['r'] : targets.stimuls['l'];
+    t.priming_value = (arrow == targets.stimuls['r']) - 0;
+    t.target_value = !(arrow == targets.stimuls['r']) - 0;
   }
 
   t.time = sequence[i][1] ? 17 : 83;
@@ -166,6 +171,18 @@ get_json('static/filles_sequence.json', function(text) {
   // 1 - естественное, 2 - рукотворное
   // должно быть 240
   fillers.words.dict = json.words.dict; 
+  // рандомная последовательность
+  fillers.words.shuffle = function() {
+    let shuffle = function(dict, first_elem) {
+      dict.shift();
+      dict = dict.sort(function(){return 0.5-Math.random();});
+      dict.unshift(first_elem);
+      return dict; 
+    }
+    window.fillers.words.dict[1] = shuffle(window.fillers.words.dict[1], window.fillers.words.dict[1][0]);
+    window.fillers.words.dict[2] = shuffle(window.fillers.words.dict[2], window.fillers.words.dict[2][0]);
+  } 
+  fillers.words.shuffle();
 
   for(var i in fillers.sequence) {
     // преобразование последовательности в лист с стимулами для фигур
@@ -199,7 +216,7 @@ get_json('static/filles_sequence.json', function(text) {
         {
           "required": true,
           "type": "html",
-          "content": "\u003Ccenter class=\"instruction\"\u003EВ исследовании Вам предстоит решать две задачи (задачи будут поочередно сменять друг друга):\u003Cbr\u003E\u003Cbr\u003E\u003Cbr\u003E\u003Chr\u003E\r\n1. На экране на короткое время будет предъявляться стрелка. Необходимо определять, в каком направлении указывает стрелка. Если стрелка указывает влево («), Вам необходимо нажать стрелку влево на клавиатуре. Если же стрелка указывает вправо (»), Вам необходимо нажать стрелку вправо на клавиатуре.  \u003Cbr\u003E\u003Cbr\u003E\u003Chr\u003E\r\n2. ${ (window.group == 1) ? \"На экране будут предъявляться геометрические фигуры. Необходимо определить, является фигура треугольником или кругом. Если фигура является треугольником, необходимо будет нажать стрелку влево.  В случае, если фигура является кругом, необходимо будет нажать стрелку вправо.\" : \"На экране будут предъявлятся слова, обозначающие определённый объект или явление. Необходимо выбрать, этот объект или явление естественного или рукотворного происхождения. Если объект естественного происхождения, надо нажать стрелку влево. В случае, если объект рукотворного происхождения, надо нажать стрелку право. Рукотворным будет считаться любой объект или явление, сделанные человеком вне зависимости от того, насколько тесную связь он имеет с природой. \" }\r\n\u003Cbr\u003E\u003Cbr\u003E\u003Chr\u003E\r\n\u003C\u002Fcenter\u003E",
+          "content": "\u003Ccenter class=\"instruction\"\u003EВ исследовании Вам предстоит решать две задачи (задачи будут поочередно сменять друг друга):\u003Cbr\u003E\u003Cbr\u003E\u003Cbr\u003E\u003Chr\u003E\r\n1. На экране на короткое время будет предъявляться стрелка. Необходимо определять, в каком направлении указывает стрелка. Если стрелка указывает влево («), Вам необходимо как можно быстрее нажать стрелку влево \u002F вправо на клавиатуренажать стрелку влево на клавиатуре. Если же стрелка указывает вправо (»), Вам необходимо как можно быстрее нажать стрелку вправо на клавиатуре.  \u003Cbr\u003E\u003Cbr\u003E\u003Chr\u003E\r\n2. ${ (window.group == 1) ? \"На экране будут предъявляться геометрические фигуры. Необходимо определить, является фигура треугольником или кругом. Если фигура является треугольником, необходимо будет нажать стрелку влево.  В случае, если фигура является кругом, необходимо будет нажать стрелку вправо.\" : \"На экране будут предъявлятся слова, обозначающие определённый объект или явление. Необходимо выбрать, этот объект или явление естественного или рукотворного происхождения. Если объект естественного происхождения, надо нажать стрелку влево. В случае, если объект рукотворного происхождения, надо нажать стрелку право. Рукотворным будет считаться любой объект или явление, сделанные человеком вне зависимости от того, насколько тесную связь он имеет с природой. \" }\r\n\u003Cbr\u003E\u003Cbr\u003E\u003Chr\u003E\r\n\u003C\u002Fcenter\u003E",
           "name": ""
         }
       ],
@@ -220,370 +237,10 @@ get_json('static/filles_sequence.json', function(text) {
       "type": "lab.flow.Loop",
       "templateParameters": [
         {
-          "id": "1"
+          "half": 0
         },
         {
-          "id": "2"
-        },
-        {
-          "id": "3"
-        },
-        {
-          "id": "4"
-        },
-        {
-          "id": "5"
-        },
-        {
-          "id": "6"
-        },
-        {
-          "id": "7"
-        },
-        {
-          "id": "8"
-        },
-        {
-          "id": "9"
-        },
-        {
-          "id": "10"
-        },
-        {
-          "id": "11"
-        },
-        {
-          "id": "12"
-        },
-        {
-          "id": "13"
-        },
-        {
-          "id": "14"
-        },
-        {
-          "id": "15"
-        },
-        {
-          "id": "16"
-        },
-        {
-          "id": "17"
-        },
-        {
-          "id": "18"
-        },
-        {
-          "id": "19"
-        },
-        {
-          "id": "20"
-        },
-        {
-          "id": "21"
-        },
-        {
-          "id": "22"
-        },
-        {
-          "id": "21"
-        },
-        {
-          "id": "22"
-        },
-        {
-          "id": "23"
-        },
-        {
-          "id": "24"
-        },
-        {
-          "id": "25"
-        },
-        {
-          "id": "26"
-        },
-        {
-          "id": "27"
-        },
-        {
-          "id": "28"
-        },
-        {
-          "id": "29"
-        },
-        {
-          "id": "30"
-        },
-        {
-          "id": "31"
-        },
-        {
-          "id": "32"
-        },
-        {
-          "id": "33"
-        },
-        {
-          "id": "34"
-        },
-        {
-          "id": "35"
-        },
-        {
-          "id": "36"
-        },
-        {
-          "id": "37"
-        },
-        {
-          "id": "38"
-        },
-        {
-          "id": "39"
-        },
-        {
-          "id": "40"
-        },
-        {
-          "id": "41"
-        },
-        {
-          "id": "42"
-        },
-        {
-          "id": "43"
-        },
-        {
-          "id": "44"
-        },
-        {
-          "id": "45"
-        },
-        {
-          "id": "46"
-        },
-        {
-          "id": "47"
-        },
-        {
-          "id": "48"
-        },
-        {
-          "id": "49"
-        },
-        {
-          "id": "50"
-        },
-        {
-          "id": "51"
-        },
-        {
-          "id": "52"
-        },
-        {
-          "id": "53"
-        },
-        {
-          "id": "54"
-        },
-        {
-          "id": "55"
-        },
-        {
-          "id": "56"
-        },
-        {
-          "id": "57"
-        },
-        {
-          "id": "58"
-        },
-        {
-          "id": "59"
-        },
-        {
-          "id": "60"
-        },
-        {
-          "id": "61"
-        },
-        {
-          "id": "62"
-        },
-        {
-          "id": "63"
-        },
-        {
-          "id": "64"
-        },
-        {
-          "id": "65"
-        },
-        {
-          "id": "66"
-        },
-        {
-          "id": "67"
-        },
-        {
-          "id": "68"
-        },
-        {
-          "id": "69"
-        },
-        {
-          "id": "70"
-        },
-        {
-          "id": "71"
-        },
-        {
-          "id": "72"
-        },
-        {
-          "id": "73"
-        },
-        {
-          "id": "74"
-        },
-        {
-          "id": "75"
-        },
-        {
-          "id": "76"
-        },
-        {
-          "id": "77"
-        },
-        {
-          "id": "78"
-        },
-        {
-          "id": "79"
-        },
-        {
-          "id": "80"
-        },
-        {
-          "id": "81"
-        },
-        {
-          "id": "82"
-        },
-        {
-          "id": "83"
-        },
-        {
-          "id": "84"
-        },
-        {
-          "id": "85"
-        },
-        {
-          "id": "86"
-        },
-        {
-          "id": "87"
-        },
-        {
-          "id": "88"
-        },
-        {
-          "id": "89"
-        },
-        {
-          "id": "90"
-        },
-        {
-          "id": "91"
-        },
-        {
-          "id": "92"
-        },
-        {
-          "id": "93"
-        },
-        {
-          "id": "94"
-        },
-        {
-          "id": "95"
-        },
-        {
-          "id": "96"
-        },
-        {
-          "id": "97"
-        },
-        {
-          "id": "98"
-        },
-        {
-          "id": "99"
-        },
-        {
-          "id": "100"
-        },
-        {
-          "id": "101"
-        },
-        {
-          "id": "102"
-        },
-        {
-          "id": "103"
-        },
-        {
-          "id": "104"
-        },
-        {
-          "id": "105"
-        },
-        {
-          "id": "106"
-        },
-        {
-          "id": "107"
-        },
-        {
-          "id": "108"
-        },
-        {
-          "id": "109"
-        },
-        {
-          "id": "110"
-        },
-        {
-          "id": "111"
-        },
-        {
-          "id": "112"
-        },
-        {
-          "id": "113"
-        },
-        {
-          "id": "114"
-        },
-        {
-          "id": "115"
-        },
-        {
-          "id": "116"
-        },
-        {
-          "id": "117"
-        },
-        {
-          "id": "118"
-        },
-        {
-          "id": "119"
-        },
-        {
-          "id": "120"
+          "half": 60
         }
       ],
       "sample": {
@@ -595,460 +252,694 @@ get_json('static/filles_sequence.json', function(text) {
       },
       "parameters": {},
       "messageHandlers": {},
-      "title": "task",
+      "title": "half_loop",
       "shuffleGroups": [],
       "template": {
-        "type": "lab.flow.Sequence",
+        "type": "lab.flow.Loop",
+        "templateParameters": [
+          {
+            "id": 1
+          },
+          {
+            "id": 2
+          },
+          {
+            "id": 3
+          },
+          {
+            "id": 4
+          },
+          {
+            "id": 5
+          },
+          {
+            "id": 6
+          },
+          {
+            "id": 7
+          },
+          {
+            "id": 8
+          },
+          {
+            "id": 9
+          },
+          {
+            "id": 10
+          },
+          {
+            "id": 11
+          },
+          {
+            "id": 12
+          },
+          {
+            "id": 13
+          },
+          {
+            "id": 14
+          },
+          {
+            "id": 15
+          },
+          {
+            "id": 16
+          },
+          {
+            "id": 17
+          },
+          {
+            "id": 18
+          },
+          {
+            "id": 19
+          },
+          {
+            "id": 20
+          },
+          {
+            "id": 21
+          },
+          {
+            "id": 22
+          },
+          {
+            "id": 23
+          },
+          {
+            "id": 24
+          },
+          {
+            "id": 25
+          },
+          {
+            "id": 26
+          },
+          {
+            "id": 27
+          },
+          {
+            "id": 28
+          },
+          {
+            "id": 29
+          },
+          {
+            "id": 30
+          },
+          {
+            "id": 31
+          },
+          {
+            "id": 32
+          },
+          {
+            "id": 33
+          },
+          {
+            "id": 34
+          },
+          {
+            "id": 35
+          },
+          {
+            "id": 36
+          },
+          {
+            "id": 37
+          },
+          {
+            "id": 38
+          },
+          {
+            "id": 39
+          },
+          {
+            "id": 40
+          },
+          {
+            "id": 41
+          },
+          {
+            "id": 42
+          },
+          {
+            "id": 43
+          },
+          {
+            "id": 44
+          },
+          {
+            "id": 45
+          },
+          {
+            "id": 46
+          },
+          {
+            "id": 47
+          },
+          {
+            "id": 48
+          },
+          {
+            "id": 49
+          },
+          {
+            "id": 50
+          },
+          {
+            "id": 51
+          },
+          {
+            "id": 52
+          },
+          {
+            "id": 53
+          },
+          {
+            "id": 54
+          },
+          {
+            "id": 55
+          },
+          {
+            "id": 56
+          },
+          {
+            "id": 57
+          },
+          {
+            "id": 58
+          },
+          {
+            "id": 59
+          },
+          {
+            "id": 60
+          }
+        ],
+        "sample": {
+          "mode": "sequential"
+        },
         "files": {},
         "responses": {
           "": ""
         },
         "parameters": {},
         "messageHandlers": {},
-        "title": "Sequence",
-        "content": [
-          {
-            "type": "lab.flow.Sequence",
-            "files": {},
-            "responses": {
-              "": ""
-            },
-            "parameters": {},
-            "messageHandlers": {},
-            "title": "task_sequence",
-            "shuffle": true,
-            "content": [
-              {
-                "type": "lab.flow.Sequence",
-                "files": {},
-                "responses": {
-                  "": ""
-                },
-                "parameters": {},
-                "messageHandlers": {},
-                "title": "target_samples",
-                "content": [
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"cross\"\u003E\u003Cspan\u003E&#10011;\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": "next"
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "cross",
-                    "timeout": "500"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": ""
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "empty_screen",
-                    "timeout": "400"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"arrow\"\u003E${ window.targets.list[parameters.id - 1].priming_stimul }\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": ""
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "prime",
-                    "tardy": true,
-                    "timeout": "17"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"sharp-mask\"\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n  \u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": ""
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "sharp_mask",
-                    "timeout": "83"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": ""
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "empty_screen",
-                    "tardy": true,
-                    "timeout": "${ window.targets.list[parameters.id - 1].time }"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"arrow\"\u003E${ window.targets.list[parameters.id - 1].target_stimul }\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E ",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": ""
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "target",
-                    "timeout": "100",
-                    "tardy": true
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "keydown(ArrowLeft)": "left_press",
-                      "keydown(ArrowRight)": "right_press"
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "empty_screen"
-                  }
-                ]
-              },
-              {
-                "type": "lab.flow.Sequence",
-                "files": {},
-                "responses": {
-                  "": ""
-                },
-                "parameters": {},
-                "messageHandlers": {},
-                "title": "filler_samples_1",
-                "content": [
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"cross\"\u003E\u003Cspan\u003E&#10011;\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": "next"
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "cross",
-                    "timeout": "500"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Cdiv\u003E\u003C\u002Fdiv\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {},
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "empty_screen_1",
-                    "timeout": "400"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"sharp-mask\"\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n  \u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": ""
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "sharp_mask",
-                    "timeout": "100"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Cdiv\u003E\u003C\u002Fdiv\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {},
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "empty_screen_2",
-                    "timeout": "83"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E \r\n  ${  \r\n    (window.group == 1 ? \r\n    \"\u003Cdiv class=\\'\" + window.fillers.shapes.list[(parameters.id * 2) - 2] + \"\\'\u003E\u003C\u002Fdiv\u003E\" +\r\n    \"\u003Cdiv class='conditions'\u003E\" +\r\n      \"\u003Cdiv class='c_left'\u003Eтреугольник\u003C\u002Fdiv\u003E\" +\r\n      \"\u003Cdiv class='c_right' style='margin-left: 70px;'\u003Eкруг\u003C\u002Fdiv\u003E\" +\r\n    \"\u003C\u002Fdiv\u003E\": \r\n    \"\u003Cdiv\u003E\" + window.fillers.words.list[(parameters.id * 2) - 2] + \"\u003C\u002Fdiv\u003E\" +\r\n    \"\u003Cdiv class='conditions'\u003E\" +\r\n      \"\u003Cdiv class='c_left'\u003Eестественное\u003C\u002Fdiv\u003E\" +\r\n      \"\u003Cdiv class='c_right'\u003Eрукотворное\u003C\u002Fdiv\u003E\" +\r\n    \"\u003C\u002Fdiv\u003E\") \r\n    } \r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "keydown(ArrowLeft)": "left_keypress",
-                      "keydown(ArrowRight)": "right_keypress"
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "target",
-                    "tardy": true
-                  }
-                ]
-              },
-              {
-                "type": "lab.flow.Sequence",
-                "files": {},
-                "responses": {
-                  "": ""
-                },
-                "parameters": {},
-                "messageHandlers": {},
-                "title": "filler_samples_2",
-                "content": [
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"cross\"\u003E\u003Cspan\u003E&#10011;\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": "next"
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "cross",
-                    "timeout": "500"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Cdiv\u003E\u003C\u002Fdiv\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {},
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "empty_screen_1",
-                    "timeout": "400"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"sharp-mask\"\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n  \u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "": ""
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "sharp_mask",
-                    "timeout": "100"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Cdiv\u003E\u003C\u002Fdiv\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {},
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "empty_screen_2",
-                    "timeout": "83"
-                  },
-                  {
-                    "type": "lab.html.Page",
-                    "items": [
-                      {
-                        "required": true,
-                        "type": "html",
-                        "content": "\u003Ccenter\u003E \r\n  ${  \r\n    (window.group == 1 ? \r\n    \"\u003Cdiv class=\\'\" + window.fillers.shapes.list[(parameters.id * 2) - 1] + \"\\'\u003E\u003C\u002Fdiv\u003E\" +\r\n    \"\u003Cdiv class='conditions'\u003E\" +\r\n      \"\u003Cdiv class='c_left'\u003Eтреугольник\u003C\u002Fdiv\u003E\" +\r\n      \"\u003Cdiv class='c_right' style='margin-left: 70px;'\u003Eкруг\u003C\u002Fdiv\u003E\" +\r\n    \"\u003C\u002Fdiv\u003E\": \r\n    \"\u003Cdiv\u003E\" + window.fillers.words.list[(parameters.id * 2) - 1] + \"\u003C\u002Fdiv\u003E\" +\r\n    \"\u003Cdiv class='conditions'\u003E\" +\r\n      \"\u003Cdiv class='c_left'\u003Eестественное\u003C\u002Fdiv\u003E\" +\r\n      \"\u003Cdiv class='c_right'\u003Eрукотворное\u003C\u002Fdiv\u003E\" +\r\n    \"\u003C\u002Fdiv\u003E\") \r\n    } \r\n\u003C\u002Fcenter\u003E",
-                        "name": ""
-                      }
-                    ],
-                    "scrollTop": true,
-                    "submitButtonText": "Continue →",
-                    "submitButtonPosition": "hidden",
-                    "files": {},
-                    "responses": {
-                      "keydown(ArrowLeft)": "left_keypress",
-                      "keydown(ArrowRight)": "right_keypress"
-                    },
-                    "parameters": {},
-                    "messageHandlers": {},
-                    "title": "target",
-                    "tardy": true
-                  }
-                ]
-              }
-            ]
+        "title": "task",
+        "shuffleGroups": [],
+        "template": {
+          "type": "lab.flow.Sequence",
+          "files": {},
+          "responses": {
+            "": ""
           },
-          {
-            "type": "lab.html.Page",
-            "items": [
-              {
-                "required": true,
-                "type": "html",
-                "content": "\u003Ccenter class=\"instruction\"\u003EТренировка завершена. Когда будете готовы, можете переходить к основной серии. \r\n\u003C\u002Fcenter\u003E",
-                "name": ""
-              }
-            ],
-            "scrollTop": true,
-            "submitButtonText": "Начать",
-            "submitButtonPosition": "right",
-            "files": {},
-            "responses": {
-              "": ""
+          "parameters": {},
+          "messageHandlers": {
+            "run": function anonymous(
+) {
+document.onkeydown = checkKey;
+
+function checkKey(e) {
+
+    e = e || window.event;
+
+    if (e.keyCode == '37') {
+       // left arrow
+       document.querySelector('#answer').value = "0";
+    }
+    else if (e.keyCode == '39') {
+       // right arrow
+       document.querySelector('#answer').value = "1";
+    }
+    else {
+      return false;
+    }
+
+    document.querySelector('#hide_submit').click();
+
+}
+}
+          },
+          "title": "Sequence (script bind keydown)",
+          "content": [
+            {
+              "type": "lab.flow.Sequence",
+              "files": {},
+              "responses": {
+                "": ""
+              },
+              "parameters": {},
+              "messageHandlers": {
+                "run": function anonymous(
+) {
+console.log(this);
+}
+              },
+              "title": "task_sequence",
+              "shuffle": true,
+              "tardy": true,
+              "content": [
+                {
+                  "type": "lab.flow.Sequence",
+                  "files": {},
+                  "responses": {
+                    "": ""
+                  },
+                  "parameters": {},
+                  "messageHandlers": {},
+                  "title": "target_samples",
+                  "content": [
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"cross\"\u003E\u003Cspan\u003E&#10011;\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {
+                        "": "next"
+                      },
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "cross",
+                      "timeout": "500"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {
+                        "": ""
+                      },
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "empty_screen",
+                      "timeout": "400"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"arrow\"\u003E${ window.targets.list[(parameters.id - 1  + parameters.half)].priming_stimul }\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {
+                        "": ""
+                      },
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "prime",
+                      "tardy": true,
+                      "timeout": "17"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"sharp-mask\"\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n  \u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {
+                        "": ""
+                      },
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "sharp_mask",
+                      "timeout": "83"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {
+                        "": ""
+                      },
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "empty_screen",
+                      "tardy": true,
+                      "timeout": "${ window.targets.list[(parameters.id - 1) + parameters.half].time }"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"arrow\"\u003E${ window.targets.list[(parameters.id - 1 + parameters.half)].target_stimul }\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E ",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {
+                        "": ""
+                      },
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "target",
+                      "timeout": "100",
+                      "tardy": true
+                    },
+                    {
+                      "type": "lab.html.Form",
+                      "content": "\u003Cform\u003E\n  \u003Cinput type=\"hidden\" name=\"target_right_answer\" value=\"${ window.targets.list[parameters.id - 1 + parameters.half].target_value }\"\u003E\n  \u003Cinput type=\"hidden\" name=\"prime\" value=\"${ window.targets.list[parameters.id - 1 + parameters.half].priming_value }\"\u003E\n  \u003Cinput type=\"hidden\" name=\"target_soa\" value=\"${ window.targets.list[parameters.id - 1 + parameters.half].time }\"\u003E\n  \u003Cinput type=\"hidden\" name=\"group\" value=\"${ window.group }\"\u003E\n  \u003Cinput type=\"hidden\" name=\"seq\" value=\"${ window.seq - 0 + 1  }\"\u003E\n  \u003Cinput type=\"hidden\" id=\"answer\" name=\"answer\" value=\"none\"\u003E\n  \u003Cbutton type=\"submit\" id=\"hide_submit\"\u003ESubmit\u003C\u002Fbutton\u003E\n\u003C\u002Fform\u003E",
+                      "scrollTop": true,
+                      "files": {},
+                      "responses": {},
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "target_answer",
+                      "tardy": true,
+                      "timeline": []
+                    }
+                  ]
+                },
+                {
+                  "type": "lab.flow.Sequence",
+                  "files": {},
+                  "responses": {
+                    "": ""
+                  },
+                  "parameters": {},
+                  "messageHandlers": {},
+                  "title": "filler_samples_1",
+                  "content": [
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"cross\"\u003E\u003Cspan\u003E&#10011;\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {
+                        "": "next"
+                      },
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "cross",
+                      "timeout": "500"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Cdiv\u003E\u003C\u002Fdiv\u003E",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {},
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "empty_screen_1",
+                      "timeout": "400"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"sharp-mask\"\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n  \u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {
+                        "": ""
+                      },
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "sharp_mask",
+                      "timeout": "100"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Cdiv\u003E\u003C\u002Fdiv\u003E",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {},
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "empty_screen_2_0",
+                      "timeout": "83"
+                    },
+                    {
+                      "type": "lab.html.Page",
+                      "items": [
+                        {
+                          "required": true,
+                          "type": "html",
+                          "content": "\u003Ccenter\u003E \r\n  ${  \r\n    (window.group == 1 ?  \r\n    \"\u003Cdiv class=\\'\" + window.fillers.shapes.list[(parameters.id + parameters.half) * 2 - 2] + \"\\'\u003E\u003C\u002Fdiv\u003E\" +\r\n    \"\u003Cdiv class='conditions'\u003E\" +\r\n      \"\u003Cdiv class='c_left'\u003Eтреугольник\u003C\u002Fdiv\u003E\" +\r\n      \"\u003Cdiv class='c_right' style='margin-left: 70px;'\u003Eкруг\u003C\u002Fdiv\u003E\" +\r\n    \"\u003C\u002Fdiv\u003E\": \r\n    \"\u003Cdiv\u003E\" + window.fillers.words.list[(parameters.id + parameters.half) * 2 - 2] + \"\u003C\u002Fdiv\u003E\" +\r\n    \"\u003Cdiv class='conditions'\u003E\" +\r\n      \"\u003Cdiv class='c_left'\u003Eестественное\u003C\u002Fdiv\u003E\" +\r\n      \"\u003Cdiv class='c_right'\u003Eрукотворное\u003C\u002Fdiv\u003E\" +\r\n    \"\u003C\u002Fdiv\u003E\") \r\n    } \r\n\u003C\u002Fcenter\u003E\r\n\u003Cform\u003E\r\n  \u003Cinput type=\"hidden\" name=\"stimul\" value=\"${ window.group == 1 ? window.fillers.shapes.list[(parameters.id + parameters.half) * 2 - 2] : window.fillers.words.list[(parameters.id + parameters.half) * 2 - 2]  }\"\u003E\r\n  \u003Cinput type=\"hidden\" name=\"fillers_right_answer\" value=\"${ window.fillers.sequence[(parameters.id + parameters.half) * 2 - 2]  }\"\u003E\r\n  \u003Cinput type=\"hidden\" id=\"answer\" name=\"answer\" value=\"none\"\u003E\r\n  \u003Cbutton type=\"submit\" id=\"hide_submit\"\u003ESubmit\u003C\u002Fbutton\u003E\r\n\u003C\u002Fform\u003E",
+                          "name": ""
+                        }
+                      ],
+                      "scrollTop": true,
+                      "submitButtonText": "Continue →",
+                      "submitButtonPosition": "hidden",
+                      "files": {},
+                      "responses": {},
+                      "parameters": {},
+                      "messageHandlers": {},
+                      "title": "filler_answer",
+                      "tardy": true
+                    }
+                  ]
+                }
+              ]
             },
-            "parameters": {},
-            "messageHandlers": {},
-            "title": "end_of_trening",
-            "skip": "${ parameters.id \u003E 1 }"
-          }
-        ]
+            {
+              "type": "lab.flow.Sequence",
+              "files": {},
+              "responses": {
+                "": ""
+              },
+              "parameters": {},
+              "messageHandlers": {},
+              "title": "filler_samples_2",
+              "content": [
+                {
+                  "type": "lab.html.Page",
+                  "items": [
+                    {
+                      "required": true,
+                      "type": "html",
+                      "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"cross\"\u003E\u003Cspan\u003E&#10011;\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
+                      "name": ""
+                    }
+                  ],
+                  "scrollTop": true,
+                  "submitButtonText": "Continue →",
+                  "submitButtonPosition": "hidden",
+                  "files": {},
+                  "responses": {
+                    "": "next"
+                  },
+                  "parameters": {},
+                  "messageHandlers": {},
+                  "title": "cross",
+                  "timeout": "500"
+                },
+                {
+                  "type": "lab.html.Page",
+                  "items": [
+                    {
+                      "required": true,
+                      "type": "html",
+                      "content": "\u003Cdiv\u003E\u003C\u002Fdiv\u003E",
+                      "name": ""
+                    }
+                  ],
+                  "scrollTop": true,
+                  "submitButtonText": "Continue →",
+                  "submitButtonPosition": "hidden",
+                  "files": {},
+                  "responses": {},
+                  "parameters": {},
+                  "messageHandlers": {},
+                  "title": "empty_screen_1",
+                  "timeout": "400"
+                },
+                {
+                  "type": "lab.html.Page",
+                  "items": [
+                    {
+                      "required": true,
+                      "type": "html",
+                      "content": "\u003Ccenter\u003E\r\n  \u003Cdiv class=\"sharp-mask\"\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n    \u003Cdiv\u003E##########\u003C\u002Fdiv\u003E\r\n  \u003C\u002Fdiv\u003E\r\n\u003C\u002Fcenter\u003E",
+                      "name": ""
+                    }
+                  ],
+                  "scrollTop": true,
+                  "submitButtonText": "Continue →",
+                  "submitButtonPosition": "hidden",
+                  "files": {},
+                  "responses": {
+                    "": ""
+                  },
+                  "parameters": {},
+                  "messageHandlers": {},
+                  "title": "sharp_mask",
+                  "timeout": "100"
+                },
+                {
+                  "type": "lab.html.Page",
+                  "items": [
+                    {
+                      "required": true,
+                      "type": "html",
+                      "content": "\u003Cdiv\u003E\u003C\u002Fdiv\u003E",
+                      "name": ""
+                    }
+                  ],
+                  "scrollTop": true,
+                  "submitButtonText": "Continue →",
+                  "submitButtonPosition": "hidden",
+                  "files": {},
+                  "responses": {},
+                  "parameters": {},
+                  "messageHandlers": {},
+                  "title": "empty_screen_2",
+                  "timeout": "83"
+                },
+                {
+                  "type": "lab.html.Page",
+                  "items": [
+                    {
+                      "required": true,
+                      "type": "html",
+                      "content": "\u003Ccenter\u003E \r\n  ${  \r\n    (window.group == 1 ? \r\n    \"\u003Cdiv class=\\'\" + window.fillers.shapes.list[(parameters.half + parameters.id) * 2 - 1] + \"\\'\u003E\u003C\u002Fdiv\u003E\" +\r\n    \"\u003Cdiv class='conditions'\u003E\" +\r\n      \"\u003Cdiv class='c_left'\u003Eтреугольник\u003C\u002Fdiv\u003E\" +\r\n      \"\u003Cdiv class='c_right' style='margin-left: 70px;'\u003Eкруг\u003C\u002Fdiv\u003E\" +\r\n    \"\u003C\u002Fdiv\u003E\": \r\n    \"\u003Cdiv\u003E\" + window.fillers.words.list[(parameters.half + parameters.id) * 2 - 1] + \"\u003C\u002Fdiv\u003E\" +\r\n    \"\u003Cdiv class='conditions'\u003E\" +\r\n      \"\u003Cdiv class='c_left'\u003Eестественное\u003C\u002Fdiv\u003E\" +\r\n      \"\u003Cdiv class='c_right'\u003Eрукотворное\u003C\u002Fdiv\u003E\" +\r\n    \"\u003C\u002Fdiv\u003E\") \r\n    } \r\n\u003C\u002Fcenter\u003E\r\n\u003Cform\u003E\r\n  \u003Cinput type=\"hidden\" name=\"stimul\" value=\"${ window.group == 1 ? window.fillers.shapes.list[(parameters.half + parameters.id) * 2 - 1] : window.fillers.words.list[(parameters.half + parameters.id) * 2 - 1]  }\"\u003E\r\n  \u003Cinput type=\"hidden\" name=\"fillers_right_answer\" value=\"${ window.fillers.sequence[(parameters.half + parameters.id) * 2 - 1]  }\"\u003E\r\n  \u003Cinput type=\"hidden\" id=\"answer\" name=\"answer\" value=\"none\"\u003E\r\n  \u003Cbutton type=\"submit\" id=\"hide_submit\"\u003ESubmit\u003C\u002Fbutton\u003E\r\n\u003C\u002Fform\u003E",
+                      "name": ""
+                    }
+                  ],
+                  "scrollTop": true,
+                  "submitButtonText": "Continue →",
+                  "submitButtonPosition": "hidden",
+                  "files": {},
+                  "responses": {},
+                  "parameters": {},
+                  "messageHandlers": {},
+                  "title": "filler_answer",
+                  "tardy": true
+                }
+              ]
+            },
+            {
+              "type": "lab.html.Page",
+              "items": [
+                {
+                  "required": true,
+                  "type": "html",
+                  "content": "\u003Ccenter class=\"instruction\"\u003EТренировка завершена. Когда будете готовы, можете переходить к основной серии. \r\n\u003C\u002Fcenter\u003E",
+                  "name": ""
+                }
+              ],
+              "scrollTop": true,
+              "submitButtonText": "Начать",
+              "submitButtonPosition": "right",
+              "files": {},
+              "responses": {
+                "": ""
+              },
+              "parameters": {},
+              "messageHandlers": {},
+              "title": "end_of_trening",
+              "skip": "${ parameters.id - 0 + parameters.half \u003E 1 }"
+            },
+            {
+              "type": "lab.html.Page",
+              "items": [
+                {
+                  "required": true,
+                  "type": "html",
+                  "content": "\u003Ccenter class=\"instruction\"\u003E\u003Ch3\u003EПервая половина эксперимента пройдена!\u003C\u002Fh3\u003E\u003Cbr\u003E\r\nМожете немного отдохнуть. \u003Cbr\u003E\r\nКогда будете готовы нажмите на кнопку \"Продолжить\".\r\n\u003Cbr\u003E\u003Cbr\u003E\u003Cbr\u003E\u003Chr\u003E\r\n\u003C\u002Fcenter\u003E",
+                  "name": ""
+                }
+              ],
+              "scrollTop": true,
+              "submitButtonText": "Продолжить →",
+              "submitButtonPosition": "right",
+              "files": {},
+              "responses": {
+                "": ""
+              },
+              "parameters": {},
+              "messageHandlers": {},
+              "title": "relax",
+              "skip": "${ parameters.half + parameters.id != 61 }"
+            }
+          ]
+        }
       }
     },
     {

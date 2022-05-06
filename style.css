@@ -17,6 +17,10 @@ button {
   cursor: pointer;
 }
 
+#hide_submit {
+  display: none;
+}
+
 .sharp-mask div:first-child {
   margin: 0 0 -45px -5px;
 }
